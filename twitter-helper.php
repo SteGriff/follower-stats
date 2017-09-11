@@ -21,7 +21,7 @@ function init()
 	);
 }
 
-function getFriendsByJoinedDate($username)
+function getConnectionInfo($username)
 {
 	$filename = "data/$username.json";
 	$friends = null;
@@ -40,9 +40,9 @@ function getFriendsByJoinedDate($username)
 		$ids = getFriends($username);
 		
 		//Get own ID as well
-		$ids[] = getMyID($username);
+		//$ids[] = getMyID($username);
 		
-		$friends = getUsers($ids);
+		$friends = getFriendships($ids);
 		
 		//Save the result
 		$json = json_encode($friends);
@@ -51,6 +51,16 @@ function getFriendsByJoinedDate($username)
 
 	// Sort by joined date
 	usort($friends, "custom_sort");
+	
+	foreach($friends as $friend)
+	{
+		var_dump($friend);
+		var_dump($friend->connections);
+		//$i_follow = $friend->connections
+		//$follows_me 
+	}
+	
+	
 	return $friends;
 }
 
@@ -71,12 +81,6 @@ function getFriends($screen_name)
 	return $response->ids;
 }
 
-function getFollowers($screen_name)
-{
-	global $twitter;
-	
-}
-
 function getMyID($screen_name)
 {
 	global $twitter;
@@ -84,6 +88,35 @@ function getMyID($screen_name)
 	$self = $twitter->request('users/show', 'GET', $request);
 
 	return $self->id_str;
+}
+
+function getFriendships($ids)
+{
+	global $twitter;
+
+	$data = [];
+
+	//Passed in $ids is an array of user id strings
+	// We chunk it into 100s because that's the limit for users/lookup
+	$id_chunks = array_chunk($ids, 100, true);
+
+	//For each chunk of 100
+	foreach($id_chunks as $id_chunk)
+	{
+		//Turn the id array into a CSV string
+		$ids_csv = implode(',', $id_chunk);
+		
+		//Prepare the request object
+		$request = ['user_id' => $ids_csv];
+		
+		//Send the request and get back array of users
+		$users = $twitter->request('friendships/lookup', 'GET', $request);
+
+		//Merge it together with previous results
+		$data = array_merge($data, $users);
+	}
+
+	return $data;
 }
 
 function getUsers($ids)
@@ -129,7 +162,12 @@ function good_bits($users)
 			'screen_name' => $u->screen_name, 
 			'name' => $u->name,
 			'joined' => $joined,
-			'id' => $u->id_str
+			'id' => $u->id_str,
+			'follows_me' => $u->following,
+			'num_followers' => $u->followers_count,
+			'num_i_follow' => $u->friends_count
+			'surplus' => $u->followers_count >= $u->friends_count,
+			'ratio' => $u->followers_count / $u->friends_count
 		];
 		$data[] = $person;
 	}
