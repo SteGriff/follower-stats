@@ -53,11 +53,9 @@ div.overview
 </script>
 </head>
 <body>
-	<h1>First on Twitter</h1>
+	<h1>Follower Stats</h1>
 
 	<main>
-	
-	<p class="summary">Who joined twitter before it was "cool"? Find out how early you joined twitter compared to the people you follow.</p>
 	
 	<?php
 	
@@ -70,42 +68,28 @@ div.overview
 	if (!empty($_GET['username']) && isset($_GET['username']))
 	{
 		$username = strtolower($_GET['username']);
-		$friends = getFriendsByJoinedDate($username);
+		$friends = getConnectionInfo($username);
 		?>
 		
 	<table>
 	<thead>
-	<th>Rank</th>
 	<th>Username</th>
 	<th>Name</th>
-	<th>Joined</th>
+	<th>Follows Me</th>
 	</thead>
 	<tbody>
 
 	<?
-	$rank = 0;
-	$my_rank = 0;
+
 	
 	foreach($friends as $f)
 	{	
-		$rank += 1;
 		$datestr = date_string($f['joined']);
 		
-		//Is this row the entered user?
-		if (strtolower($f['screen_name']) === $username)
-		{
-			$my_rank = $rank;
-			echo "<tr class='user'>";
-		}
-		else
-		{
-			echo "<tr>";
-		}
-		
-		echo "<td>$rank</td>
+		echo "<tr>
 		<td class='username'>@{$f['screen_name']}</td>
 		<td class='name'>{$f['name']}</td>
-		<td class='joined'>$datestr</td>
+		<td class='follows_me'>{$f['follows_me']}</td>
 		</tr>";
 	}
 	?>
@@ -114,7 +98,7 @@ div.overview
 	</table>
 	
 	<div class="overview">
-		<? echo "You rank $my_rank out of $rank in your friends for twitter-hipness"; ?>
+
 	</div>
 		
 	<?

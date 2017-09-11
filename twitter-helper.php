@@ -49,18 +49,6 @@ function getConnectionInfo($username)
 		file_put_contents($filename, $json);
 	}
 
-	// Sort by joined date
-	usort($friends, "custom_sort");
-	
-	foreach($friends as $friend)
-	{
-		var_dump($friend);
-		var_dump($friend->connections);
-		//$i_follow = $friend->connections
-		//$follows_me 
-	}
-	
-	
 	return $friends;
 }
 
@@ -94,7 +82,7 @@ function getFriendships($ids)
 {
 	global $twitter;
 
-	$data = [];
+	$friends = [];
 
 	//Passed in $ids is an array of user id strings
 	// We chunk it into 100s because that's the limit for users/lookup
@@ -113,9 +101,32 @@ function getFriendships($ids)
 		$users = $twitter->request('friendships/lookup', 'GET', $request);
 
 		//Merge it together with previous results
-		$data = array_merge($data, $users);
+		$friends = array_merge($friends, $users);
 	}
 
+	$data = formatFriends($friends);
+	usort($data, "follows_me");
+	
+	return $data;
+}
+
+function formatFriends($friends)
+{
+	$data = [];
+	foreach($friends as $u)
+	{
+		$i_follow = in_array('following', $u->connections);
+		$follows_me = in_array('followed_by', $u->connections);
+		
+		$obj = [
+			'screen_name' => $u->screen_name, 
+			'name' => $u->name,
+			'follows_me' => $follows_me
+		];
+		
+		$data[] = $obj;
+	}
+	
 	return $data;
 }
 
@@ -165,7 +176,7 @@ function good_bits($users)
 			'id' => $u->id_str,
 			'follows_me' => $u->following,
 			'num_followers' => $u->followers_count,
-			'num_i_follow' => $u->friends_count
+			'num_i_follow' => $u->friends_count,
 			'surplus' => $u->followers_count >= $u->friends_count,
 			'ratio' => $u->followers_count / $u->friends_count
 		];
@@ -174,8 +185,8 @@ function good_bits($users)
 	return $data;
 }
 
-function custom_sort($a,$b) {
-	return $a['joined']>$b['joined'];
+function follows_me($a,$b) {
+	return $a['follows_me']<=$b['follows_me'];
 }
 
 function date_string($joined)
