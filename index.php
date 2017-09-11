@@ -16,7 +16,7 @@
 	init();
 
 	$username = 'robouncle';
-	$enable = isset($_GET['enable']) && ($_GET['enable'] == $username);
+	$enable = isset($_GET['enable']) && ($_GET['enable'] == $password);
 	
 	$friends = [];
 	if ($enable)
