@@ -1,6 +1,7 @@
-	<?php
-	include 'twitter-helper.php';
-
+<?php
+	require_once 'twitter-helper.php';
+	require_once 'api_utils.php';
+	
 	init();
 
 	$username = 'robouncle';
@@ -11,20 +12,11 @@
 		exit('Bad password');
 	}
 	
-	$people_to_unfollow = [];
-	
 	$unfollow_list = "../data/unfollow.json";
-	if (file_exists($unfollow_list))
-	{
-		$unfollow_data = file_get_contents($unfollow_list);
-		$people_to_unfollow = json_decode($unfollow_data, true);
-	}
-	else
-	{
-		//Create empty file
-		touch($unfollow_list);
-	}
-	
+	$exile_list = "../data/exile.json";
+	$people_to_unfollow = decode_or_create_json_file($unfollow_list);
+	$exiles = decode_or_create_json_file($exile_list);
+		
 	if (count($people_to_unfollow) > 0)
 	{
 		
