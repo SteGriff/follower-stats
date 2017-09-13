@@ -24,24 +24,11 @@ function init()
 function getConnectionInfo($username)
 {
 	$filename = "data/$username.json";
-	$friends = null;
 	
-	/*
-	If cached result exists, load it
-	if (file_exists($filename))
-	{
-		$cached = file_get_contents($filename);
-		$friends = json_decode($cached, true);
-	}
-	else
-	{ }
-	*/
-		
 	//Send a new req to Twitter API
 
 	//Get all friends IDs
 	$ids = getFriends($username);
-
 	$friends = getFriendships($ids);
 
 	//Log the result
@@ -135,6 +122,14 @@ function formatFriends($friends)
 	}
 	
 	return $data;
+}
+
+function unfollow($screen_name)
+{
+	global $twitter;
+	$request = ['screen_name' => $screen_name];
+	$response = $twitter->request('friendships/destroy', 'POST', $request);
+	return $response;
 }
 
 function follows_me($a,$b) {

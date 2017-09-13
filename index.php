@@ -18,6 +18,9 @@
 	$username = 'robouncle';
 	$enable = isset($_GET['enable']) && ($_GET['enable'] == $password);
 	
+	$following = 0;
+	$followbacks = 0;
+	
 	$friends = [];
 	if ($enable)
 	{
@@ -38,6 +41,9 @@
 
 	foreach($friends as $f)
 	{			
+		$following += 1;
+		$followbacks += $f['follows_me'];
+		
 		echo "<tr>
 		<td class='username'>@{$f['screen_name']}</td>
 		<td class='name'>{$f['name']}</td>
@@ -50,6 +56,7 @@
 	</tbody>
 	</table>
 
+	<p>Following back/Following = <? echo "$followbacks/$following"; ?></p>
 	</main>
 	
 </body>
