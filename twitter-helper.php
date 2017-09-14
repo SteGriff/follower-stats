@@ -112,6 +112,7 @@ function formatFriends($friends)
 		$connections_csv = implode(',', $u->connections);
 		
 		$obj = [
+			'id' => $u->id_str,
 			'screen_name' => $u->screen_name, 
 			'name' => $u->name,
 			'follows_me' => $follows_me,

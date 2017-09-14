@@ -1,5 +1,8 @@
 <?php
 
+	/*
+		File utils
+	*/
 	function get_or_create_list_file($filename)
 	{
 		logline("Decode or create $filename");
@@ -20,6 +23,9 @@
 		return $entities;
 	}
 	
+	/*
+		Convert between list of newline-separated strings and an array
+	*/
 	function array_to_list_file($array)
 	{
 		return implode("\n", $array);
@@ -31,6 +37,22 @@
 		return $array;
 	}
 	
+	/*
+		Convert between comma-separated IDs and array
+	*/
+	function array_to_csv($array)
+	{
+		return implode(',', $array);
+	}
+	
+	function parse_csv($csv)
+	{
+		$return explode(',', $csv);
+	}
+	
+	/*
+		Logging
+	*/
 	function logline($x)
 	{
 		global $log;

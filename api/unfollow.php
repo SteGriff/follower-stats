@@ -17,7 +17,7 @@
 	// {
 		// exit('Bad password');
 	// }
-	logline("Start");
+	logline("---- Start Unfollowing [1/2] ----");
 	
 	//Get the list of people to unfollow and those to never follow again
 	// first time we run this, the list is empty and may have to be created
@@ -70,7 +70,25 @@
 	logline('Write log');
 	file_put_contents($log_file, $log);
 	
-	logline('Finished');
+	logline('---- Finished Unfollowing [1/2]----');
+	logline('---- Start Targeting [2/2]----');
+	
+	$friends = getConnectionInfo($username);
+	$ids = [];
+	
+	//Get IDs of people who don't follow back
+	foreach($friends as $friend)
+	{
+		if ($f['follows_me'] < 1)
+		{
+			$ids[] = $f['id'];
+		}
+	}
+	
+	//Look up the length of relationship with the targets
+	// filter to only those who I've been following more than a day
+	// TODO
+	
 	/*
 		Unfollow Task - every 24 hours (48?)
 			Unfollow everyone on deletion list if any (initially empty)
