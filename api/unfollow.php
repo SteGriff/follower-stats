@@ -23,14 +23,23 @@
 	// first time we run this, the list is empty and may have to be created
 	$unfollow_list = "../data/unfollow.txt";
 	$exile_list = "../data/exile.txt";
+	
+	//These are arrays of usernames
 	$people_to_unfollow = get_or_create_list_file($unfollow_list);
 	$exiles = get_or_create_list_file($exile_list);
 		
-	logline("People to unfollow:");
+	logline("Checking people to unfollow...");
 
 	// Unfollow everyone on deletion list (if any)
 	if (count($people_to_unfollow) > 0)
 	{
+		logline("Get current friendship statuses...");
+		
+		//Check they still don't follow (get connections using username list)
+		$friendships = getFriendships($people_to_unfollow, true);
+		
+		logline("Got connections.");
+		
 		foreach($people_to_unfollow as $person)
 		{			
 			if (trim($person) == '') {
@@ -38,20 +47,25 @@
 				continue;
 			}
 			
-			logline("Unfollowing $person");
-			
-			$result = unfollow($person);
-			
-			logline ("Unfollowed $person");
-			
-			//Add them to exiles list - this is a courtesy to the user
-			// so that we don't keep following and unfollowing repeatedly
-			$exiles[] = trim($person);
+			if ($friendships[$person]['follows_me'])
+			{
+				logline(" >>> News flash! $person now follows me. Skip!");
+			}
+			else
+			{
+				logline("Unfollowing $person");
+				//unfollow($person);
+				logline (" > Unfollowed $person");
+				//Add them to exiles list - this is a courtesy to the user
+				// so that we don't keep following and unfollowing repeatedly
+				$exiles[] = trim($person);
+			}
+
 		}
 	}
 	else
 	{
-		logline("No one in list to unfollow");
+		logline("No one in list to unfollow!");
 	}
 	
 	logline('Clear unfollow list');
@@ -60,8 +74,8 @@
 
 	// Write exiles list
 	
-	logline('Exiles');
-	var_dump($exiles);
+	logline('----------');
+	logline('Exiles:');
 	$list = array_to_list_file($exiles);
 	logline($list);
 	file_put_contents($exile_list, $list);
@@ -73,7 +87,7 @@
 	logline('---- Finished Unfollowing [1/2]----');
 	logline('---- Start Targeting [2/2]----');
 	
-	$friends = getConnectionInfo($username);
+	$friends = getFriendConnections($username);
 	$ids = [];
 	
 	//Get IDs of people who don't follow back
@@ -106,7 +120,5 @@
 						Limit -= 1;
 			If Limit == 0 Then Exit
 	*/
-	
-	//$friends = getConnectionInfo($username);
-	
+		
 	

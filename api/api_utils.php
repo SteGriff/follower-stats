@@ -47,7 +47,7 @@
 	
 	function parse_csv($csv)
 	{
-		$return explode(',', $csv);
+		return explode(',', $csv);
 	}
 	
 	/*

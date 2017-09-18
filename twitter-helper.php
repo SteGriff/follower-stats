@@ -21,14 +21,32 @@ function init()
 	);
 }
 
-function getConnectionInfo($username)
+function getConnections($username_array)
 {
-	$filename = "data/$username.json";
 	
-	//Send a new req to Twitter API
+}
 
+function getFriendConnections($username)
+{
+	$filename = "data/$username-friends.json";
+	
 	//Get all friends IDs
 	$ids = getFriends($username);
+	$friends = getFriendships($ids);
+
+	//Log the result
+	$json = json_encode($friends);
+	file_put_contents($filename, $json);
+
+	return $friends;
+}
+
+function getFollowerConnections($username)
+{
+	$filename = "data/$username-followers.json";
+	
+	//Get all followers IDs
+	$ids = getFollowers($username);
 	$friends = getFriendships($ids);
 
 	//Log the result
@@ -54,6 +72,15 @@ function getFriends($screen_name)
 	return $response->ids;
 }
 
+function getFollowers($screen_name)
+{
+	global $twitter;
+	
+	$request = ['screen_name' => $screen_name, 'stringify_ids' => 'true'];
+	$response = $twitter->request('followers/ids', 'GET', $request);
+	return $response->ids;
+}
+
 function getMyID($screen_name)
 {
 	global $twitter;
@@ -63,7 +90,7 @@ function getMyID($screen_name)
 	return $self->id_str;
 }
 
-function getFriendships($ids)
+function getFriendships($ids, $is_screen_names = false)
 {
 	global $twitter;
 
@@ -73,6 +100,8 @@ function getFriendships($ids)
 	// We chunk it into 100s because that's the limit for users/lookup
 	$id_chunks = array_chunk($ids, 100, true);
 
+	$search_criteria = $is_screen_names ? 'screen_name' : 'user_id';
+	
 	//For each chunk of 100
 	foreach($id_chunks as $id_chunk)
 	{
@@ -80,7 +109,7 @@ function getFriendships($ids)
 		$ids_csv = implode(',', $id_chunk);
 		
 		//Prepare the request object
-		$request = ['user_id' => $ids_csv];
+		$request = [$search_criteria => $ids_csv];
 		
 		//Send the request and get back array of users
 		$users = $twitter->request('friendships/lookup', 'GET', $request);
@@ -119,7 +148,7 @@ function formatFriends($friends)
 			'connections' => $connections_csv
 		];
 		
-		$data[] = $obj;
+		$data[$u->screen_name] = $obj;
 	}
 	
 	return $data;

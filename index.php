@@ -24,7 +24,7 @@
 	$friends = [];
 	if ($enable)
 	{
-		$friends = getConnectionInfo($username);
+		$friends = getFriendConnections($username);
 	}
 	?>
 		
