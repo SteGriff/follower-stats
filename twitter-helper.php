@@ -112,27 +112,26 @@ function getFriendships($ids, $is_screen_names = false)
 		$request = [$search_criteria => $ids_csv];
 		
 		//Send the request and get back array of users
-		$users = $twitter->request('friendships/lookup', 'GET', $request);
-
-		//Merge it together with previous results
-		$friends = array_merge($friends, $users);
+		$friends = $twitter->request('friendships/lookup', 'GET', $request);
 	}
 
 	//Log raw data
-	$filename = "data/raw.json";
-	$json = json_encode($friends);
-	file_put_contents($filename, $json);
+	//$filename = "data/raw.json";
+	//$json = json_encode($friends);
+	//file_put_contents($filename, $json);
 	
 	//Filter, sort, and return
 	// This transforms it from a PHP class to an associative array
 	$data = formatFriends($friends);
-	usort($data, "follows_me");
 	
 	return $data;
 }
 
 function formatFriends($friends)
 {
+	// echo "formatFriends input\r\n";
+	// var_dump($friends);
+	
 	$data = [];
 	foreach($friends as $u)
 	{
@@ -150,6 +149,9 @@ function formatFriends($friends)
 		
 		$data[$u->screen_name] = $obj;
 	}
+	
+	// echo "formatFriends output\r\n";
+	// var_dump($data);
 	
 	return $data;
 }

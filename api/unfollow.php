@@ -6,7 +6,7 @@
 	
 	$log = '';
 	$time = time();
-	$log_file = "../data/log$time.txt";
+	$log_file = "../data/unfollow-log$time.txt";
 	
 	init();
 
@@ -38,7 +38,11 @@
 		//Check they still don't follow (get connections using username list)
 		$friendships = getFriendships($people_to_unfollow, true);
 		
-		logline("Got connections.");
+		// logline(" >> ALL FRIENDSHIPS:");
+		// var_dump($friendships);
+		
+		logline("Got connections. Let's start:");
+		logline("----------");
 		
 		foreach($people_to_unfollow as $person)
 		{			
@@ -47,9 +51,13 @@
 				continue;
 			}
 			
-			if ($friendships[$person]['follows_me'])
+			//var_dump($friendships[$person]);
+			$follows_back = $friendships[$person]['follows_me'];
+			logline("Check $person. follows_me = $follows_back");
+			
+			if ($follows_back)
 			{
-				logline(" >>> News flash! $person now follows me. Skip!");
+				logline(" >>> News flash! $person now follows back! Skip!");
 			}
 			else
 			{

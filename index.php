@@ -25,6 +25,7 @@
 	if ($enable)
 	{
 		$friends = getFriendConnections($username);
+		usort($friends, "follows_me");
 	}
 	?>
 		

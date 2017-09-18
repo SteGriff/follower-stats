@@ -9,9 +9,8 @@
 		$entities = [];
 		if (file_exists($filename))
 		{
-			logline("Exists; decoding...");
+			logline("$filename exists; decoding...");
 			$data = file_get_contents($filename);
-			logline("Content: $data");
 			$entities = parse_list($data);
 		}
 		else
