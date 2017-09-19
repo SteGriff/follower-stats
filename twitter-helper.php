@@ -28,15 +28,15 @@ function getConnections($username_array)
 
 function getFriendConnections($username)
 {
-	$filename = "data/$username-friends.json";
+	//$filename = "data/$username-friends.json";
 	
 	//Get all friends IDs
 	$ids = getFriends($username);
 	$friends = getFriendships($ids);
 
 	//Log the result
-	$json = json_encode($friends);
-	file_put_contents($filename, $json);
+	// $json = json_encode($friends);
+	// file_put_contents($filename, $json);
 
 	return $friends;
 }

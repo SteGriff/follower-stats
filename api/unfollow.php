@@ -11,13 +11,13 @@
 	init();
 
 	$username = 'robouncle';
-	// $enable = isset($_POST['password']) && ($_POST['password'] == $password);
+	$enable = isset($_POST['password']) && ($_POST['password'] == $password);
 	
-	// if (!enable)
-	// {
-		// exit('Bad password');
-	// }
-	logline("---- Start Unfollowing [1/2] ----");
+	if (!enable)
+	{
+		exit('Bad password');
+	}
+	logline("---- Start unfollowing [1/2] ----");
 	
 	//Get the list of people to unfollow and those to never follow again
 	// first time we run this, the list is empty and may have to be created
@@ -33,7 +33,7 @@
 	// Unfollow everyone on deletion list (if any)
 	if (count($people_to_unfollow) > 0)
 	{
-		logline("Get current friendship statuses...");
+		logline("Get friendship connections...");
 		
 		//Check they still don't follow (get connections using username list)
 		$friendships = getFriendships($people_to_unfollow, true);
@@ -41,7 +41,7 @@
 		// logline(" >> ALL FRIENDSHIPS:");
 		// var_dump($friendships);
 		
-		logline("Got connections. Let's start:");
+		logline("Got connections. Begin:");
 		logline("----------");
 		
 		foreach($people_to_unfollow as $person)
@@ -53,17 +53,16 @@
 			
 			//var_dump($friendships[$person]);
 			$follows_back = $friendships[$person]['follows_me'];
-			logline("Check $person. follows_me = $follows_back");
+			//logline("Check $person. follows_me = $follows_back");
 			
 			if ($follows_back)
 			{
-				logline(" >>> News flash! $person now follows back! Skip!");
+				logline("Skipped $person - they now follow back!");
 			}
 			else
 			{
-				logline("Unfollowing $person");
-				//unfollow($person);
-				logline (" > Unfollowed $person");
+				unfollow($person);
+				logline ("Unfollowed $person");
 				//Add them to exiles list - this is a courtesy to the user
 				// so that we don't keep following and unfollowing repeatedly
 				$exiles[] = trim($person);
@@ -88,28 +87,41 @@
 	logline($list);
 	file_put_contents($exile_list, $list);
 	
+	logline('---- Finished unfollowing [1/2]----');
+	logline('---- Start targeting [2/2]----');
+	
+	$friends = getFriendConnections($username);
+	$names = [];
+	$limit = 100;
+	
+	//Get names of people who don't follow back
+	foreach($friends as $f)
+	{
+		if (!$f['follows_me'])
+		{
+			$name = $f['screen_name'];
+			$names[] = $name;
+			$limit--;
+			logline("Targeted $name ($limit)");
+		}
+		if ($limit == 0)
+		{
+			logline("Limit reached.");
+			break;
+		}
+	}
+	
+	logline("Saving unfollow list.");
+	$list_content = array_to_list_file($names);
+	file_put_contents($unfollow_list, $list_content);
+	
+	logline('---- Finished targeting [2/2]----');
+	
 	// Write log
 	logline('Write log');
 	file_put_contents($log_file, $log);
 	
-	logline('---- Finished Unfollowing [1/2]----');
-	logline('---- Start Targeting [2/2]----');
-	
-	$friends = getFriendConnections($username);
-	$ids = [];
-	
-	//Get IDs of people who don't follow back
-	foreach($friends as $friend)
-	{
-		if ($f['follows_me'] < 1)
-		{
-			$ids[] = $f['id'];
-		}
-	}
-	
-	//Look up the length of relationship with the targets
-	// filter to only those who I've been following more than a day
-	// TODO
+	logline('Finished!');
 	
 	/*
 		Unfollow Task - every 24 hours (48?)

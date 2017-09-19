@@ -25,6 +25,8 @@
 	if ($enable)
 	{
 		$friends = getFriendConnections($username);
+		$followers = getFollowerConnections($username);
+		$friends = array_merge($friends, $followers);
 		usort($friends, "follows_me");
 	}
 	?>
