@@ -21,9 +21,17 @@
 	// }
 	logline("---- Start following back [1/2] ----");
 	
-	// Write log
-	logline('Write log');
-	file_put_contents($log_file, $log);
+	$followers = getFollowerConnections($username);
+	
+	foreach($followers as $f)
+	{
+		if (!$f['i_follow'])
+		{
+			$name = $f['screen_name'];
+			follow($name);
+			logline("Followed $name");
+		}
+	}
 	
 	logline('---- Finished following back [1/2]----');
 	logline('---- Start organic following [2/2]----');
@@ -33,6 +41,12 @@
 	
 	//These is an array of usernames
 	$exiles = get_or_create_list_file($exile_list);
+	
+	
+	// Write log
+	logline('Write log');
+	file_put_contents($log_file, $log);
+	
 	
 	/*
 		Follow Task - Every 2 hours?

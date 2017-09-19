@@ -144,6 +144,7 @@ function formatFriends($friends)
 			'screen_name' => $u->screen_name, 
 			'name' => $u->name,
 			'follows_me' => $follows_me,
+			'i_follow' => $i_follow,
 			'connections' => $connections_csv
 		];
 		
@@ -154,6 +155,17 @@ function formatFriends($friends)
 	// var_dump($data);
 	
 	return $data;
+}
+
+/*
+	Follow and unfollow actions
+*/
+function follow($screen_name)
+{
+	global $twitter;
+	$request = ['screen_name' => $screen_name];
+	$response = $twitter->request('friendships/create', 'POST', $request);
+	return $response;
 }
 
 function unfollow($screen_name)
