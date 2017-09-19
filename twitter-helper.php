@@ -43,15 +43,15 @@ function getFriendConnections($username)
 
 function getFollowerConnections($username)
 {
-	$filename = "data/$username-followers.json";
+	// $filename = "data/$username-followers.json";
 	
 	//Get all followers IDs
 	$ids = getFollowers($username);
 	$friends = getFriendships($ids);
 
 	//Log the result
-	$json = json_encode($friends);
-	file_put_contents($filename, $json);
+	// $json = json_encode($friends);
+	// file_put_contents($filename, $json);
 
 	return $friends;
 }

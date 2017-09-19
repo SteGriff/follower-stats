@@ -13,7 +13,7 @@
 	$username = 'robouncle';
 	$enable = isset($_POST['password']) && ($_POST['password'] == $password);
 	
-	if (!enable)
+	if (!$enable)
 	{
 		exit('Bad password');
 	}

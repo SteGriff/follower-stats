@@ -13,12 +13,12 @@
 	$username = 'robouncle';
 	$limit = 10;
 	
-	// $enable = isset($_POST['password']) && ($_POST['password'] == $password);
+	$enable = isset($_POST['password']) && ($_POST['password'] == $password);
 	
-	// if (!enable)
-	// {
-		// exit('Bad password');
-	// }
+	if (!$enable)
+	{
+		exit('Bad password');
+	}
 	logline("---- Start following back [1/2] ----");
 	
 	$followers = getFollowerConnections($username);
