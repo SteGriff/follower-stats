@@ -157,6 +157,59 @@ function formatFriends($friends)
 	return $data;
 }
 
+function getUsers($ids)
+{
+	global $twitter;
+
+	$data = [];
+
+	//Passed in $ids is an array of user id strings
+	// We chunk it into 100s because that's the limit for users/lookup
+	$id_chunks = array_chunk($ids, 100, true);
+	
+	//For each chunk of 100
+	foreach($id_chunks as $id_chunk)
+	{
+		//Turn the id array into a CSV string
+		$ids_csv = implode(',', $id_chunk);
+		
+		//Prepare the request object
+		$request = ['user_id' => $ids_csv];
+		
+		//Send the request and get back array of users
+		$users = $twitter->request('users/lookup', 'GET', $request);
+
+		//Get the interesting fields from the users
+		$users_good_bits = formatUser($users);
+		
+		//Merge it together with previous results
+		$data = array_merge($data, $users_good_bits);
+	}
+
+	return $data;
+}
+
+function formatUser($users)
+{
+	$data = [];
+	foreach ($users as $u)
+	{
+		$joined = date_parse($u->created_at);
+		
+		$person = [
+			'screen_name' => $u->screen_name, 
+			'name' => $u->name,
+			'joined' => $joined,
+			'id' => $u->id_str,
+			'followers_count' => $u->followers_count,
+			'following_count' => $u->friends_count,
+			'deficit' => $u->friends_count > $u->followers_count
+		];
+		$data[] = $person;
+	}
+	return $data;
+}
+
 /*
 	Follow and unfollow actions
 */

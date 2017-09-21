@@ -52,10 +52,11 @@
 	/*
 		Logging
 	*/
-	function logline($x)
+	function logline($x, $tag = 'p')
 	{
 		global $log;
-		echo "$x\r\n";
-		$log .= "$x\r\n";
+		$line = "<$tag>$x</$tag>\r\n";
+		echo $line;
+		$log .= $line;
 	}
 	
