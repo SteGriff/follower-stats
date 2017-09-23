@@ -15,6 +15,7 @@
 	
 	if (!$enable)
 	{
+		logline($_POST['password']);
 		exit('Bad password');
 	}
 	logline("---- Start unfollowing [1/2] ----");

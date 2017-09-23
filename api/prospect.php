@@ -14,6 +14,7 @@
 	
 	if (!$enable)
 	{
+		logline($_POST['password']);
 		exit('Bad password');
 	}
 	logline('Start organic following', 'h1');
@@ -28,9 +29,13 @@
 	//Get the list of people to never follow again as an array of usernames
 	$exile_list = "../data/exile.txt";
 	$exiles = get_or_create_list_file($exile_list);
-		
+	
+	logline("Got selected followers");
+	
 	foreach($selected_followers as $follower)
 	{
+		logline("Selected follower: $follower")
+		
 		//Get the IDs of people who follow this follower
 		$follower_name = $follower['screen_name'];
 		$ids = getFollowers($follower_name);
@@ -39,13 +44,18 @@
 		
 		foreach($their_followers as $peep)
 		{
-			if ($peep['deficit'] && !in_array($peep['screen_name'], $exiles))
+			$peep_name = $peep['screen_name'];
+			if ($peep['deficit'] && !in_array($peep_name, $exiles))
 			{
-				
+				$peep['referrer'] = $follower_name;
+				logline(" > Recommend $peep_name");
+			}
+			else
+			{
+				logline("Skip $peep_name");
 			}
 		}
 	}
-	
 	
 	logline('Finished organic following', 'h1');
 	

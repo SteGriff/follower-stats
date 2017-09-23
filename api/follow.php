@@ -14,6 +14,7 @@
 	
 	if (!$enable)
 	{
+		logline($_POST['password']);
 		exit('Bad password');
 	}
 	logline("Start following back", "h1");
