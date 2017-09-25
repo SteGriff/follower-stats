@@ -34,11 +34,11 @@
 	
 	foreach($selected_followers as $follower)
 	{
-		logline("Selected follower: $follower")
-		
 		//Get the IDs of people who follow this follower
 		$follower_name = $follower['screen_name'];
 		$ids = getFollowers($follower_name);
+
+		logline("Selected follower: $follower_name");
 				
 		$their_followers = getUsers($ids);
 		
