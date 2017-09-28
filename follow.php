@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Follower Stats</title>
+<title>Followers</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<h1>Follower Stats</h1>
+	<h1>Follow-back targets</h1>
 
 	<main>
 	
@@ -18,14 +18,13 @@
 	$username = 'robouncle';
 	$enable = isset($_GET['enable']) && ($_GET['enable'] == $password);
 	
-	$following = 0;
-	$followbacks = 0;
+	$followers = 0;
+	$i_follow = 0;
 	
 	$friends = [];
 	if ($enable)
 	{
-		$friends = getFriendConnections($username);
-		//usort($friends, "follows_me");
+		$friends = getFollowerConnections($username);
 	}
 	?>
 		
@@ -34,6 +33,7 @@
 	<th>Username</th>
 	<th>Name</th>
 	<th>Follows Me</th>
+	<th>I Follow</th>
 	<th>Extra Data</th>
 	</thead>
 	<tbody>
@@ -42,13 +42,14 @@
 
 	foreach($friends as $f)
 	{			
-		$following += 1;
-		$followbacks += $f['follows_me'];
+		$followers += 1;
+		$i_follow += $f['i_follow'];
 		
 		echo "<tr>
 		<td class='username'>@{$f['screen_name']}</td>
 		<td class='name'>{$f['name']}</td>
 		<td class='follows_me'>{$f['follows_me']}</td>
+		<td>{$f['i_follow']}</td>
 		<td>{$f['connections']}</td>
 		</tr>";
 	}
@@ -57,11 +58,7 @@
 	</tbody>
 	</table>
 
-	<p>Following back/Following = <? echo "$followbacks/$following"; ?></p>
-	
-	<pre>
-		<? echo getRateLimitJson(); ?>
-	</pre>
+	<p>I follow/Followers = <? echo "$i_follow/$followers"; ?></p>
 	</main>
 	
 </body>

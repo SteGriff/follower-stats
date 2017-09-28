@@ -21,11 +21,6 @@ function init()
 	);
 }
 
-function getConnections($username_array)
-{
-	
-}
-
 function getFriendConnections($username)
 {
 	//$filename = "data/$username-friends.json";
@@ -47,6 +42,8 @@ function getFollowerConnections($username)
 	
 	//Get all followers IDs
 	$ids = getFollowers($username);
+	//file_put_contents('getFollowConnections_ids', json_encode($ids));
+	
 	$friends = getFriendships($ids);
 
 	//Log the result
@@ -56,11 +53,12 @@ function getFollowerConnections($username)
 	return $friends;
 }
 
-function getRateLimit()
+function getRateLimitJson()
 {
 	global $twitter;
 	$request = ['resources' => 'friends,followers,users'];
 	$response = $twitter->request('application/rate_limit_status', 'GET', $request);
+	return json_encode($response, JSON_PRETTY_PRINT);
 }
 
 function getFriends($screen_name)
@@ -112,7 +110,8 @@ function getFriendships($ids, $is_screen_names = false)
 		$request = [$search_criteria => $ids_csv];
 		
 		//Send the request and get back array of users
-		$friends = $twitter->request('friendships/lookup', 'GET', $request);
+		$chunk_friends = $twitter->request('friendships/lookup', 'GET', $request);
+		$friends = array_merge($friends, $chunk_friends);
 	}
 
 	//Log raw data
