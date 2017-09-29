@@ -31,6 +31,7 @@
 		
 	<table>
 	<thead>
+	<th>ID</th>
 	<th>Username</th>
 	<th>Name</th>
 	<th>Follows Me</th>
@@ -46,6 +47,7 @@
 		$followbacks += $f['follows_me'];
 		
 		echo "<tr>
+		<td>{$f['id']}</td>
 		<td class='username'>@{$f['screen_name']}</td>
 		<td class='name'>{$f['name']}</td>
 		<td class='follows_me'>{$f['follows_me']}</td>

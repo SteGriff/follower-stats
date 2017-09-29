@@ -70,11 +70,13 @@ function getFriends($screen_name)
 	return $response->ids;
 }
 
-function getFollowers($screen_name)
+function getFollowers($id, $is_screen_names = true)
 {
 	global $twitter;
 	
-	$request = ['screen_name' => $screen_name, 'stringify_ids' => 'true'];
+	$search_criteria = $is_screen_names ? 'screen_name' : 'user_id';
+	
+	$request = [$search_criteria => "$id", 'stringify_ids' => 'true'];
 	$response = $twitter->request('followers/ids', 'GET', $request);
 	return $response->ids;
 }

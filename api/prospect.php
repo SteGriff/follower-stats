@@ -4,7 +4,8 @@
 		
 	$log = '';
 	$time = time();
-	$log_file = "../data/prospect-log$time.txt";
+	$log_file = "../data/prospect-log$time.htm";
+	$log_today = "../today/prospect-log$time.htm";
 	
 	init();
 
@@ -17,34 +18,37 @@
 		logline($_POST['password']);
 		exit('Bad password');
 	}
+	$date = date('r', $time);
 	logline('Start organic following', 'h1');
+	logline("$time - $date");
 	
 	$limit = 10;
 	logline("Limit is $limit");
 	
+	//Array of IDs
 	$followers = getFollowers($username);
 	
 	//Take 3 random followers (or use our follower count if it is < 3!)
 	$take = min(count($followers), 3);
 	logline("Plan to use $take referrers");
 	
-	$selected_followers = array_rand($followers, $take);
+	$selected_follower_indices = array_rand($followers, $take);
+	//var_dump($selected_follower_indices);
 	
-	$actual_referrer_count = count($selected_followers);
+	$actual_referrer_count = count($selected_follower_indices);
 	logline("Got $actual_referrer_count referrers");
 	
 	//Get the list of people to never follow again as an array of usernames
 	$exile_list = "../data/exile.txt";
 	$exiles = get_or_create_list_file($exile_list);
 		
-	foreach($selected_followers as $follower)
+	foreach($selected_follower_indices as $follower_index)
 	{
+		$follower_id = $followers[$follower_index];
+		logline("Selected referrer: $follower_id", 'h2');
+		
 		//Get the IDs of people who follow this follower
-		$follower_name = $follower['screen_name'];
-		$ids = getFollowers($follower_name);
-
-		logline("Selected follower: $follower_name", 'h2');
-				
+		$ids = getFollowers($follower_id, false);
 		$their_followers = getUsers($ids);
 		
 		foreach($their_followers as $peep)
@@ -54,9 +58,16 @@
 			{
 				if (!in_array($peep_name, $exiles))
 				{
-					$peep['referrer'] = $follower_name;
-					logline(" > Recommend $peep_name ($limit)");
-					$limit -= 1;
+					try
+					{
+						follow($peep_name);
+						logline(" + Followed $peep_name ($limit)");
+						$limit -= 1;
+					}
+					catch (Exception $ex)
+					{
+						logline(" - Failed to follow $peep_name - exception thrown");
+					}
 				}
 				else
 				{
@@ -83,6 +94,8 @@
 	// Write log
 	logline('Write log');
 	file_put_contents($log_file, $log);
+	
+	//copy($log_file, $log_today);
 	
 	/*
 		Follow Task - Every 2 hours?

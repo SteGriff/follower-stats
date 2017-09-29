@@ -6,7 +6,8 @@
 	
 	$log = '';
 	$time = time();
-	$log_file = "../data/unfollow-log$time.txt";
+	$log_file = "../data/unfollow-log$time.htm";
+	$log_today = "../today/unfollow-log$time.htm";
 	
 	init();
 
@@ -18,7 +19,13 @@
 		logline($_POST['password']);
 		exit('Bad password');
 	}
-	logline("---- Start unfollowing [1/2] ----");
+	$date = date('r', $time);
+	logline("Start unfollowing [1/2]");
+	logline("$time - $date");
+	
+	/*
+		Part 1/2
+	*/
 	
 	//Get the list of people to unfollow and those to never follow again
 	// first time we run this, the list is empty and may have to be created
@@ -29,12 +36,12 @@
 	$people_to_unfollow = get_or_create_list_file($unfollow_list);
 	$exiles = get_or_create_list_file($exile_list);
 		
-	logline("Checking people to unfollow...");
+	logline('Checking people to unfollow...');
 
 	// Unfollow everyone on deletion list (if any)
 	if (count($people_to_unfollow) > 0)
 	{
-		logline("Get friendship connections...");
+		logline('Get friendship connections...');
 		
 		//Check they still don't follow (get connections using username list)
 		$friendships = getFriendships($people_to_unfollow, true);
@@ -42,8 +49,7 @@
 		// logline(" >> ALL FRIENDSHIPS:");
 		// var_dump($friendships);
 		
-		logline("Got connections. Begin:");
-		logline("----------");
+		logline('Got connections. Begin:', 'h2');
 		
 		foreach($people_to_unfollow as $person)
 		{			
@@ -62,11 +68,18 @@
 			}
 			else
 			{
-				unfollow($person);
-				logline ("Unfollowed $person");
-				//Add them to exiles list - this is a courtesy to the user
-				// so that we don't keep following and unfollowing repeatedly
-				$exiles[] = trim($person);
+				try
+				{
+					unfollow($person);
+					logline ("Unfollowed $person");
+					//Add them to exiles list - this is a courtesy to the user
+					// so that we don't keep following and unfollowing repeatedly
+					$exiles[] = trim($person);
+				}
+				catch (Exception $ex)
+				{
+					logline (" - Failed to unfollow $person - exception thrown");
+				}
 			}
 
 		}
@@ -82,14 +95,19 @@
 
 	// Write exiles list
 	
-	logline('----------');
-	logline('Exiles:');
+	$exiles_count = count($exiles);
+	logline("There are $exiles_count exiles", 'h2');
+	
 	$list = array_to_list_file($exiles);
-	logline($list);
+	//logline($list);
 	file_put_contents($exile_list, $list);
 	
-	logline('---- Finished unfollowing [1/2]----');
-	logline('---- Start targeting [2/2]----');
+	/*
+		Part 2/2
+	*/
+	
+	logline('Finished unfollowing [1/2]', 'h2');
+	logline('Start targeting [2/2]', 'h2');
 	
 	$friends = getFriendConnections($username);
 	$names = [];
@@ -116,13 +134,13 @@
 	$list_content = array_to_list_file($names);
 	file_put_contents($unfollow_list, $list_content);
 	
-	logline('---- Finished targeting [2/2]----');
+	logline('Finished targeting [2/2]', 'h2');
 	
 	// Write log
 	logline('Write log');
 	file_put_contents($log_file, $log);
 	
-	logline('Finished!');
+	//copy($log_file, $log_today);
 	
 	/*
 		Unfollow Task - every 24 hours (48?)
