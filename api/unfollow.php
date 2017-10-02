@@ -37,6 +37,7 @@
 	$exiles = get_or_create_list_file($exile_list);
 		
 	logline('Checking people to unfollow...');
+	$sleep_useconds = 100000; //100k usecs = 100ms = 0.1s
 
 	// Unfollow everyone on deletion list (if any)
 	if (count($people_to_unfollow) > 0)
@@ -75,6 +76,7 @@
 					//Add them to exiles list - this is a courtesy to the user
 					// so that we don't keep following and unfollowing repeatedly
 					$exiles[] = trim($person);
+					usleep($sleep_useconds);
 				}
 				catch (Exception $ex)
 				{
@@ -111,7 +113,7 @@
 	
 	$friends = getFriendConnections($username);
 	$names = [];
-	$limit = 100;
+	$limit = 4;
 	
 	//Get names of people who don't follow back
 	foreach($friends as $f)
