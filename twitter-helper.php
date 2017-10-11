@@ -112,8 +112,17 @@ function getFriendships($ids, $is_screen_names = false)
 		$request = [$search_criteria => $ids_csv];
 		
 		//Send the request and get back array of users
-		$chunk_friends = $twitter->request('friendships/lookup', 'GET', $request);
-		$friends = array_merge($friends, $chunk_friends);
+		try
+		{
+			$chunk_friends = $twitter->request('friendships/lookup', 'GET', $request);
+			$friends = array_merge($friends, $chunk_friends);
+		}
+		catch (Exception $ex)
+		{
+			//Rate limit met on this chunk,
+			// let's give up and stick with what we've got
+			break;
+		}
 	}
 
 	//Log raw data
@@ -146,7 +155,9 @@ function formatFriends($friends)
 			'name' => $u->name,
 			'follows_me' => $follows_me,
 			'i_follow' => $i_follow,
-			'connections' => $connections_csv
+			'connections' => $connections_csv,
+			'time_zone' => $u->time_zone,
+			'location' => $u->location
 		];
 		
 		$data[$u->screen_name] = $obj;
@@ -204,7 +215,9 @@ function formatUser($users)
 			'id' => $u->id_str,
 			'followers_count' => $u->followers_count,
 			'following_count' => $u->friends_count,
-			'deficit' => $u->friends_count > $u->followers_count
+			'deficit' => $u->friends_count > $u->followers_count,
+			'time_zone' => $u->time_zone,
+			'location' => $u->location
 		];
 		$data[] = $person;
 	}

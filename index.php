@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Follower Stats</title>
+<title>FS - Who I'm following</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<h1>Follower Stats</h1>
+	<h1>Who I'm following</h1>
 
 	<main>
 	
