@@ -24,7 +24,7 @@
 	$friends = [];
 	if ($enable)
 	{
-		$friends = getFollowerConnections($username);
+		$friends = getAllFollowersInfo($username);
 	}
 	?>
 		
@@ -33,9 +33,8 @@
 	<th>ID</th>
 	<th>Username</th>
 	<th>Name</th>
-	<th>Follows Me</th>
-	<th>I Follow</th>
-	<th>Extra Data</th>
+	<th>Location</th>
+	<th>Time Zone</th>
 	</thead>
 	<tbody>
 
@@ -50,9 +49,8 @@
 		<td>{$f['id']}</td>
 		<td class='username'>@{$f['screen_name']}</td>
 		<td class='name'>{$f['name']}</td>
-		<td class='follows_me'>{$f['follows_me']}</td>
-		<td>{$f['i_follow']}</td>
-		<td>{$f['connections']}</td>
+		<td>{$f['location']}</td>
+		<td>{$f['time_zone']}</td>
 		</tr>";
 	}
 	?>

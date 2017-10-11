@@ -139,8 +139,7 @@ function getFriendships($ids, $is_screen_names = false)
 
 function formatFriends($friends)
 {
-	// echo "formatFriends input\r\n";
-	// var_dump($friends);
+	// For formatting data from friendships/lookup
 	
 	$data = [];
 	foreach($friends as $u)
@@ -155,9 +154,7 @@ function formatFriends($friends)
 			'name' => $u->name,
 			'follows_me' => $follows_me,
 			'i_follow' => $i_follow,
-			'connections' => $connections_csv,
-			'time_zone' => $u->time_zone,
-			'location' => $u->location
+			'connections' => $connections_csv
 		];
 		
 		$data[$u->screen_name] = $obj;
@@ -167,6 +164,23 @@ function formatFriends($friends)
 	// var_dump($data);
 	
 	return $data;
+}
+
+/*
+	Users, not connections
+*/
+
+function getAllFollowersInfo($username)
+{
+	$friends = [];
+
+	//Get all followers IDs
+	$ids = getFollowers($username);
+	
+	//Get mostly-hydrated users (objects shrunk using formatUser)
+	$friends = getUsers($ids);
+	
+	return $friends;
 }
 
 function getUsers($ids)
@@ -188,14 +202,22 @@ function getUsers($ids)
 		//Prepare the request object
 		$request = ['user_id' => $ids_csv];
 		
-		//Send the request and get back array of users
-		$users = $twitter->request('users/lookup', 'GET', $request);
+		try
+		{
+			//Send the request and get back array of users
+			$users = $twitter->request('users/lookup', 'GET', $request);
 
-		//Get the interesting fields from the users
-		$users_good_bits = formatUser($users);
-		
-		//Merge it together with previous results
-		$data = array_merge($data, $users_good_bits);
+			//Get the interesting fields from the users
+			$users_good_bits = formatUser($users);
+			
+			//Merge it together with previous results
+			$data = array_merge($data, $users_good_bits);
+		}
+		catch (Exception $ex)
+		{
+			//Rate limit, leave with what we got so far
+			break;
+		}
 	}
 
 	return $data;
@@ -227,6 +249,7 @@ function formatUser($users)
 /*
 	Follow and unfollow actions
 */
+
 function follow($screen_name)
 {
 	global $twitter;
