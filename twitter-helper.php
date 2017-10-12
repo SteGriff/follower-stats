@@ -146,6 +146,7 @@ function formatFriends($friends)
 	{
 		$i_follow = in_array('following', $u->connections);
 		$follows_me = in_array('followed_by', $u->connections);
+		$follow_requested = in_array('following_requested', $u->connections);
 		$connections_csv = implode(',', $u->connections);
 		
 		$obj = [
@@ -154,6 +155,7 @@ function formatFriends($friends)
 			'name' => $u->name,
 			'follows_me' => $follows_me,
 			'i_follow' => $i_follow,
+			'follow_requested' => $follow_requested,
 			'connections' => $connections_csv
 		];
 		

@@ -1,5 +1,6 @@
 <?php
 	require_once '../twitter-helper.php';
+	require_once '../acceptance.php';
 	require_once 'api_utils.php';
 		
 	$log = '';
@@ -58,15 +59,22 @@
 			{
 				if (!in_array($peep_name, $exiles))
 				{
-					try
+					if (accept_market($peep))
 					{
-						follow($peep_name);
-						logline(" + Followed $peep_name ($limit)");
-						$limit -= 1;
+						try
+						{
+							follow($peep_name);
+							logline(" + Followed $peep_name ($limit)");
+							$limit -= 1;
+						}
+						catch (Exception $ex)
+						{
+							logline(" - Failed to follow $peep_name - exception thrown");
+						}
 					}
-					catch (Exception $ex)
+					else
 					{
-						logline(" - Failed to follow $peep_name - exception thrown");
+						logline("Skip $peep_name - failed market acceptance");
 					}
 				}
 				else

@@ -29,14 +29,21 @@
 		if (!$f['i_follow'])
 		{
 			$name = $f['screen_name'];
-			try
+			if ($f['follow_requested'])
 			{
-				follow($name);
-				logline("Followed $name");
+				logline("Skip $name, follow already requested");
 			}
-			catch (Exception $ex)
+			else
 			{
-				logline(" - Failed to follow $name - exception thrown");
+				try
+				{
+					follow($name);
+					logline("Followed $name");
+				}
+				catch (Exception $ex)
+				{
+					logline(" - Failed to follow $name - exception thrown");
+				}
 			}
 		}
 	}
