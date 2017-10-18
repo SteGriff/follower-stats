@@ -31,18 +31,33 @@
 	
 	logline("Limit is $limit");
 	
-	//Array of IDs
-	$followers = getFollowers($username);
+	//Get initial referring Follower ID from POST 
+	// to override usual routine of picking three at random
+	$referrer = isset($_POST['referrer'])
+		? $_POST['referrer']
+		: null;
+		
+	logline($referrer ? "Injected referrer: $referrer" : "No injected referrer");
 	
-	//Take 3 random followers (or use our follower count if it is < 3!)
-	$take = min(count($followers), 3);
-	logline("Plan to use $take referrers");
-	
-	$selected_follower_indices = array_rand($followers, $take);
-	//var_dump($selected_follower_indices);
-	
-	$actual_referrer_count = count($selected_follower_indices);
-	logline("Got $actual_referrer_count referrers");
+	if ($referrer)
+	{
+		$followers = [$referrer];
+		$selected_follower_indices = [0];
+	}
+	else
+	{
+		//Array of IDs
+		$followers = getFollowers($username);
+		
+		//Take 3 random followers (or use our follower count if it is < 3!)
+		$take = min(count($followers), 3);
+		logline("Plan to use $take referrers");
+		
+		$selected_follower_indices = array_rand($followers, $take);
+		
+		$actual_referrer_count = count($selected_follower_indices);
+		logline("Got $actual_referrer_count referrers");
+	}
 	
 	//Get the list of people to never follow again as an array of usernames
 	$exile_list = "../data/exile.txt";
