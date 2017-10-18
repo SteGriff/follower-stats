@@ -23,7 +23,12 @@
 	logline('Start organic following', 'h1');
 	logline("$time - $date");
 	
-	$limit = 10;
+	//Get Limit from POST or use default
+	$default_limit = 10;
+	$limit = (isset($_POST['limit']) && is_numeric($_POST['limit']))
+		? $_POST['limit']
+		: $default_limit;
+	
 	logline("Limit is $limit");
 	
 	//Array of IDs
